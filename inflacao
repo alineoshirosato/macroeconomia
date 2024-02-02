@@ -12,6 +12,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
 
+# Importação dos dados do site Sidra
 ipca_raw = sidrapy.get_table(table_code='1737',
                              territorial_level='1',
                              ibge_territorial_code='all',
@@ -19,6 +20,30 @@ ipca_raw = sidrapy.get_table(table_code='1737',
                              period='all',
                              header='n')
 
+#Roda a tabela
 ipca_raw
 
+# Realiza a limpeza e manipulação da tabela
+ipca =  (
+     ipca_raw
+    .loc[0:,['V', 'D2C']]
+    .rename(columns = {'V': 'ipca',
+                       'D2C': 'date'}
+            )
+      )
 
+ipca = ipca.loc[ipca.date >= '2004-01-01']
+ipca['date'] = pd.to_datetime(ipca['date'],
+                              format = '%Y%m')
+
+ipca['ipca'] = ipca['ipca'].astype(float)
+ipca.describe()
+sns.lineplot(x = 'date',
+             y = 'ipca',
+             data = ipca)
+
+sns.histplot(x = 'ipca',
+             data = ipca)
+
+sns.boxplot(y = 'ipca',
+            data = ipca)
